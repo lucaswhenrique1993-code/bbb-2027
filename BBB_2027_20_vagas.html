@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BBB 2027 — Inscrição</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#080808;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}
+.card{width:min(470px,100%);background:#111;border:2px solid #ffd400;border-radius:24px;padding:26px;box-shadow:0 0 30px #ffd40033}
+.logo{text-align:center;font-size:48px;font-weight:900;color:#ffd400}.year{text-align:center;font-size:22px;font-weight:900;margin-bottom:20px}
+label{display:block;color:#ffd400;font-weight:800;margin:14px 0 7px}
+input,textarea{width:100%;padding:14px;border-radius:12px;border:1px solid #555;background:#222;color:#fff;font-size:16px;font-family:Arial}
+textarea{min-height:145px;resize:vertical}.hint{font-size:12px;color:#aaa;margin-top:5px}
+button{width:100%;margin-top:20px;padding:16px;border:0;border-radius:14px;background:#ffd400;color:#080808;font-size:17px;font-weight:900;cursor:pointer}
+#resultado{display:none;text-align:center;margin-top:20px;padding:25px 15px;border-radius:16px;background:#181818;border:1px solid #ffd400}
+.ok{font-size:25px;color:#ffd400;font-weight:900}.sub{margin-top:10px;line-height:1.5}
+.bad{color:#ffda00}.small{text-align:center;color:#777;font-size:11px;margin-top:15px}
+</style>
+</head>
+<body>
+<div class="card">
+  <div id="formulario">
+    <div class="logo">BBB</div>
+    <div class="year">2027 • INSCRIÇÃO</div>
+
+    <label>Qual é seu nome?</label>
+    <input id="nome" placeholder="Digite seu nome">
+
+    <label>Qual é sua idade?</label>
+    <input id="idade" type="number" min="1" max="120" placeholder="Digite sua idade">
+
+    <label>O que você deseja fazer dentro da casa?</label>
+    <input id="casa" placeholder="Digite sua resposta">
+
+    <label>Conte um pouco sobre você</label>
+    <textarea id="texto" placeholder="Escreva sua apresentação aqui..."></textarea>
+    <div class="hint">Mínimo de 5 linhas.</div>
+
+    <button onclick="enviar()">ENVIAR INSCRIÇÃO</button>
+    <div id="erro" class="hint"></div>
+  </div>
+
+  <div id="resultado">
+    <div class="ok">🎉 VOCÊ ENTROU NO BBB 2027!</div>
+    <div class="sub">Parabéns, <b id="nomeFinal"></b>!<br>Você garantiu uma das <b>20 vagas</b> da casa.</div>
+  </div>
+
+  <div class="small">BBB 2027 • Projeto fictício para diversão</div>
+</div>
+
+<script>
+const TOTAL_VAGAS=20;
+function contar(){
+  return Number(localStorage.getItem('bbb2027_vagas')||'0');
+}
+function enviar(){
+  const nome=document.getElementById('nome').value.trim();
+  const idade=document.getElementById('idade').value.trim();
+  const casa=document.getElementById('casa').value.trim();
+  const texto=document.getElementById('texto').value.trim();
+  const erro=document.getElementById('erro');
+  erro.textContent='';
+
+  if(!nome||!idade||!casa||!texto){erro.textContent='Preencha todos os campos.';return;}
+  const linhas=texto.split(/\n/).map(x=>x.trim()).filter(Boolean).length;
+  if(linhas<5){erro.textContent='A apresentação precisa ter no mínimo 5 linhas.';return;}
+
+  let vagas=contar();
+  if(vagas>=TOTAL_VAGAS){
+    erro.textContent='As 20 vagas já foram preenchidas.';
+    return;
+  }
+
+  vagas++;
+  localStorage.setItem('bbb2027_vagas',String(vagas));
+  const inscricoes=JSON.parse(localStorage.getItem('bbb2027_inscricoes')||'[]');
+  inscricoes.push({nome,idade,casa,texto,vaga:vagas,data:new Date().toLocaleString('pt-BR')});
+  localStorage.setItem('bbb2027_inscricoes',JSON.stringify(inscricoes));
+
+  document.getElementById('nomeFinal').textContent=nome;
+  document.getElementById('formulario').style.display='none';
+  document.getElementById('resultado').style.display='block';
+}
+</script>
+</body>
+</html>
